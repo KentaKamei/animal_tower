@@ -15,18 +15,23 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Animal Tower Battle")
 
 # 動物の初期位置
-animal_x = 375
+animal_x = (screen_width - 50) // 2
 animal_y = 10
 
 # 動物の速度
 animal_speed = 0.5
 
-# ステージの初期設定
-stage_width = random.randint(screen_width / 4,screen_width / 4 * 3 )  # ステージの幅をランダムに設定
-stage_height = 30  
-stage_color = (154, 205, 50)  # ステージの色
-stage_x = (screen_width - stage_width) // 2
-stage_y = screen_height / 3 * 2
+#ステージの作成
+triangles = []
+triangle_quantity = random.randint(5, 12)
+origin_x = (screen_width - triangle_quantity * 50) // 2
+
+for i in range(triangle_quantity):
+    triangle_vertex_y = random.randint(screen_height * 3 / 4 + 10, screen_height * 3 / 4 + 30)
+    triangle_vertex_x =random.randint(origin_x + 10, origin_x + 30)
+    triangle_vertices = [(origin_x, screen_height * 3 / 4), (origin_x + 50, screen_height * 3 / 4), (triangle_vertex_x, triangle_vertex_y)]
+    triangles.append(triangle_vertices)
+    origin_x += 50
 
 # ゲームループ
 running = True
@@ -45,11 +50,12 @@ while running:
     # 背景を描画
     screen.fill(background_color)
 
-    # ステージを描画
-    pygame.draw.rect(screen, stage_color, (stage_x, stage_y, stage_width, stage_height))
-
     # 動物を描画
     pygame.draw.rect(screen, (255, 0, 0), (animal_x, animal_y, 50, 50))
+
+    # ステージを描画
+    for triangle in triangles:
+        pygame.draw.polygon(screen, (0, 128, 0), triangle)
 
     # 画面更新
     pygame.display.update()
