@@ -27,7 +27,7 @@ triangle_quantity = random.randint(5, 12)
 origin_x = (screen_width - triangle_quantity * 50) // 2
 
 for i in range(triangle_quantity):
-    triangle_vertex_y = random.randint(screen_height * 3 / 4 + 10, screen_height * 3 / 4 + 30)
+    triangle_vertex_y = random.randint(screen_height * 3 / 4 + 15, screen_height * 3 / 4 + 30)
     triangle_vertex_x =random.randint(origin_x + 10, origin_x + 30)
     triangle_vertices = [(origin_x, screen_height * 3 / 4), (origin_x + 50, screen_height * 3 / 4), (triangle_vertex_x, triangle_vertex_y)]
     triangles.append(triangle_vertices)
