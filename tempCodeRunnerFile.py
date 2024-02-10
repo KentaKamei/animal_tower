@@ -16,7 +16,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Animal Tower Battle")
 
 # 動物の速度
-animal_speed = 0.05
+animal_speed = 0.5
 
 # 物理エンジンの初期化
 space = pymunk.Space()
@@ -44,9 +44,8 @@ for i in range(triangle_quantity):
 # ステージの物理ボディを作成
 for triangle in triangles:
     stage_body = pymunk.Body(body_type=pymunk.Body.STATIC)  # 静的ボディ
-    converted_triangle = [(vertex[0], screen_height - vertex[1]) for vertex in triangle]
-    stage_shape = pymunk.Poly(stage_body, converted_triangle)
-    stage_shape.elasticity = 0.2  # 弾性
+    stage_shape = pymunk.Poly(stage_body, triangle)
+    stage_shape.elasticity = 0.8  # 弾性
     space.add(stage_body, stage_shape)
 
 
