@@ -23,12 +23,21 @@ space = pymunk.Space()
 space.gravity = (0, -0.5)  # 重力の設定
 
 # 物理ボディの作成
-body = pymunk.Body(1, 100)  # 質量1, 慣性モーメント100
-body.position = (screen_width - 50) // 2, screen_height - 50  # 初期位置
-shape = pymunk.Poly.create_box(body, (50, 50))  # 矩形の形状
-shape.friction = 0.7 
-shape.elasticity = 0.3
-space.add(body, shape)  # 物理エンジンに追加
+def create_animal(space, x, y):
+    body = pymunk.Body(1, 100)  # 質量1, 慣性モーメント100
+    body.position = (screen_width - 50) // 2, screen_height - 50  # 初期位置
+    shape = pymunk.Poly.create_box(body, (50, 50))  # 矩形の形状
+    shape.friction = 0.7 
+    shape.elasticity = 0.3
+    space.add(body, shape)  # 物理エンジンに追加
+    return body, shape
+
+def reset_animal(space, body):
+    space.remove(body, body.shapes[0])  # 現在の動物を削除
+    return create_animal(space, (screen_width - 50) // 2, screen_height - 50)  # 新しい動物を生成
+
+#初期動物を生成
+body, shape = create_animal(space, (screen_width - 50) // 2, screen_height - 50)
 
 #ステージの作成
 triangles = []
@@ -77,6 +86,10 @@ while running:
         # 物理エンジンのステップを実行
         dt = 1 / 120  # 60 FPSで更新
         space.step(dt)
+
+    # 物体が画面下に落下したかチェック
+    if body.position.y < 0:
+        running = False
 
     # 背景を描画
     screen.fill(background_color)
