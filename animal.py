@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import pymunk
+import time
 
 # Pygameの初期化
 pygame.init()
@@ -15,8 +16,11 @@ background_color = (255, 255, 255)
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Animal Tower Battle")
 
+# すべての動物のbodyとshapeを格納するリスト
+animals = []
+
 # 動物の速度
-animal_speed = 0.05
+animal_speed = 0.1
 
 # 物理エンジンの初期化
 space = pymunk.Space()
@@ -25,16 +29,14 @@ space.gravity = (0, -0.5)  # 重力の設定
 # 物理ボディの作成
 def create_animal(space, x, y):
     body = pymunk.Body(1, 100)  # 質量1, 慣性モーメント100
-    body.position = (screen_width - 50) // 2, screen_height - 50  # 初期位置
+    body.position = x, y # 初期位置
     shape = pymunk.Poly.create_box(body, (50, 50))  # 矩形の形状
     shape.friction = 0.7 
     shape.elasticity = 0.3
     space.add(body, shape)  # 物理エンジンに追加
+    animals.append((body, shape))
     return body, shape
 
-def reset_animal(space, body):
-    space.remove(body, body.shapes[0])  # 現在の動物を削除
-    return create_animal(space, (screen_width - 50) // 2, screen_height - 50)  # 新しい動物を生成
 
 #初期動物を生成
 body, shape = create_animal(space, (screen_width - 50) // 2, screen_height - 50)
@@ -61,9 +63,11 @@ for triangle in triangles:
     stage_shape.friction = 0.7
     space.add(stage_body, stage_shape)
 
+# 物体の静止を検出した時刻と経過時間の初期化
+start_time = None
+static_elapsed = 0
 
 clicked = False
-
 # ゲームループ
 running = True
 while running:
@@ -72,7 +76,7 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             clicked = True  # クリックされたらフラグをTrueにする
-
+    
 
     # キー入力の処理
     keys = pygame.key.get_pressed()
@@ -91,13 +95,28 @@ while running:
     if body.position.y < 0:
         running = False
 
+    if clicked and body.velocity.length < 0.000001:
+        if start_time is None:
+            start_time = time.time()  # 静止開始時刻を記録
+        else:
+            static_elapsed = time.time() - start_time  # 静止経過時間を計算
+            if body.velocity.length >= 0.000001:
+                start_time = None
+            if static_elapsed > 2:
+                body, shape = create_animal(space, (screen_width - 50) // 2, screen_height - 50)  # 新しい動物を生成
+                clicked = False  # 必要に応じてリセット
+                start_time = None  # タイマーをリセット
+    else:
+        start_time = None
+
+
     # 背景を描画
     screen.fill(background_color)
 
     # 動物を描画
-    pos_x, pos_y = body.position
-    angle = body.angle
-    pygame.draw.rect(screen, (255, 0, 0), (pos_x - 25, screen_height - pos_y - 25, 50, 50))  # ボディを描画
+    for body, shape in animals:
+        pos_x, pos_y = body.position
+        pygame.draw.rect(screen, (255, 0, 0), (pos_x - 25, screen_height - pos_y - 25, 50, 50))
 
     # ステージを描画
     for triangle in triangles:
