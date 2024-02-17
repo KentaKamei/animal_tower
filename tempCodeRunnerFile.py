@@ -16,7 +16,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Animal Tower Battle")
 
 # 動物の速度
-animal_speed = 0.05
+animal_speed = 0.5
 
 # 物理エンジンの初期化
 space = pymunk.Space()
@@ -26,8 +26,6 @@ space.gravity = (0, -0.5)  # 重力の設定
 body = pymunk.Body(1, 100)  # 質量1, 慣性モーメント100
 body.position = (screen_width - 50) // 2, screen_height - 50  # 初期位置
 shape = pymunk.Poly.create_box(body, (50, 50))  # 矩形の形状
-shape.friction = 0.7 
-shape.elasticity = 0.3
 space.add(body, shape)  # 物理エンジンに追加
 
 #ステージの作成
@@ -46,10 +44,8 @@ for i in range(triangle_quantity):
 # ステージの物理ボディを作成
 for triangle in triangles:
     stage_body = pymunk.Body(body_type=pymunk.Body.STATIC)  # 静的ボディ
-    converted_triangle = [(vertex[0], screen_height - vertex[1]) for vertex in triangle]
-    stage_shape = pymunk.Poly(stage_body, converted_triangle)
-    stage_shape.elasticity = 0.7  # 弾性
-    stage_shape.friction = 0.7
+    stage_shape = pymunk.Poly(stage_body, triangle)
+    stage_shape.elasticity = 0.8  # 弾性
     space.add(stage_body, stage_shape)
 
 
@@ -75,7 +71,7 @@ while running:
     # クリックされるまで物理エンジンのステップを実行しない
     if clicked:
         # 物理エンジンのステップを実行
-        dt = 1 / 120  # 60 FPSで更新
+        dt = 1 / 60  # 60 FPSで更新
         space.step(dt)
 
     # 背景を描画
@@ -84,7 +80,7 @@ while running:
     # 動物を描画
     pos_x, pos_y = body.position
     angle = body.angle
-    pygame.draw.rect(screen, (255, 0, 0), (pos_x - 25, screen_height - pos_y - 25, 50, 50))  # ボディを描画
+    pygame.draw.rect(screen, (255, 255, 0), (pos_x - 25, screen_height - pos_y - 25, 50, 50))  # ボディを描画
 
     # ステージを描画
     for triangle in triangles:
