@@ -32,7 +32,7 @@ def create_animal(space, x, y):
     body.position = x, y # 初期位置
     shape = pymunk.Poly.create_box(body, (50, 50))  # 矩形の形状
     shape.friction = 0.7 
-    shape.elasticity = 0.3
+    shape.elasticity = 0.0
     space.add(body, shape)  # 物理エンジンに追加
     animals.append((body, shape))
     return body, shape
@@ -68,6 +68,8 @@ start_time = None
 static_elapsed = 0
 
 clicked = False
+accept_input = True
+
 # ゲームループ
 running = True
 while running:
@@ -79,17 +81,19 @@ while running:
     
 
     # キー入力の処理
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        body.position -= (animal_speed, 0)
-    if keys[pygame.K_RIGHT]:
-        body.position += (animal_speed, 0)
+    if accept_input:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            body.position -= (animal_speed, 0)
+        if keys[pygame.K_RIGHT]:
+            body.position += (animal_speed, 0)
 
     # クリックされるまで物理エンジンのステップを実行しない
     if clicked:
         # 物理エンジンのステップを実行
         dt = 1 / 120  # 60 FPSで更新
         space.step(dt)
+        accept_input = False
 
     # 物体が画面下に落下したかチェック
     if body.position.y < 0:
@@ -106,6 +110,7 @@ while running:
                 body, shape = create_animal(space, (screen_width - 50) // 2, screen_height - 50)  # 新しい動物を生成
                 clicked = False  # 必要に応じてリセット
                 start_time = None  # タイマーをリセット
+                accept_input = True
     else:
         start_time = None
 
